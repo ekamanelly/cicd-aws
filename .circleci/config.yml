@@ -203,7 +203,7 @@ jobs:
             apk add --update ansible
             apk add openssh
             apk add curl 
-            apK add unzip
+            apk add unzip
       - run: exit 1      
       - run:
           name: Configure server
