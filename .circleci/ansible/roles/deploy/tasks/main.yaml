@@ -1,9 +1,23 @@
 ---
-- name: extract artifact
-  become: true
-  unarchive:
-    src: files/artifact.tar.gz
-    dest: .
+# - name: extract artifact
+#   become: true
+#   unarchive:
+#     src: files/artifact.tar.gz
+#     dest: .
+- name: "extract deploy and start backend" 
+  become: true 
+  shell: echo "extract"
+
+- name: "copy over artifact"
+  become: true 
+  copy:
+    src: ~/project/artifact.tar.gz
+    dest: ./artifact.tar.gz
+
+- name: "extract the zipped artifact"
+  become: true  
+  shell: | 
+    tar xzvf artifact.tar.gz 
 
 - name: load environment variables
   become_method: sudo
@@ -22,13 +36,20 @@
     echo "TYPEORM_DATABASE={{ lookup('env', 'TYPEORM_DATABASE')}}" >> .env
     echo "TYPEORM_MIGRATIONS={{ lookup('env', 'TYPEORM_MIGRATIONS')}}" >> .env
     echo "TYPEORM_MIGRATIONS_DIR={{ lookup('env', 'TYPEORM_MIGRATIONS_DIR')}}" >> .env
-    
-- name: start server
+
+
+- name : "start server"    
   become: true
-  become_method: sudo
-  become_user: root 
   shell: |
     npm install
     pm2 stop default
-    pm2 start npm -- start
-    pm2 start dist/main.js --name node-app
+    pm2 start npm -- start    
+# - name: start server
+#   become: true
+#   become_method: sudo
+#   become_user: root 
+#   shell: |
+#     npm install
+#     pm2 stop default
+#     pm2 start npm -- start
+#     pm2 start dist/main.js --name node-app
