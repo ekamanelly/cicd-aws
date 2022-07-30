@@ -229,7 +229,6 @@ jobs:
                 # If you are using kvdb.io, generate the bucket ID "9GE4jRtKznmVKRfvdBABBe" in your local terminal first
                 curl  -k https://kvdb.io/A5TFMALrhCcaW2aKmV7FtK/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
               fi
-
       - destroy-environment
       
   deploy-frontend:
@@ -266,6 +265,9 @@ jobs:
       - install_awscli
       - empty-bucket
       - destroy-environment
+
+
+
   deploy-backend:
     executor: ansible-image
     steps:
@@ -284,11 +286,7 @@ jobs:
             cd backend
             npm i
             npm run build
-            cd ..
-            # Zip the directory
-            tar -C backend -czvf artifact.tar.gz .
-            mkdir -p ~/project/.circleci/ansible/roles/deploy/files/
-            mv artifact.tar.gz .circleci/ansible/roles/deploy/files/artifact.tar.gz
+            tar -C backend -czvf artifact.tar.gz . 
             cd .circleci/ansible
             echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
