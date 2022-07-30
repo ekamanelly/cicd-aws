@@ -43,8 +43,9 @@
   shell: |
     npm install
     pm2 stop default
-    pm2 start npm -- start    
+    pm2 start dist/main.js --name node-appx
 # - name: start server
+    # pm2 start npm -- start    
 #   become: true
 #   become_method: sudo
 #   become_user: root 
@@ -52,4 +53,3 @@
 #     npm install
 #     pm2 stop default
 #     pm2 start npm -- start
-#     pm2 start dist/main.js --name node-app
