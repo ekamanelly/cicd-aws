@@ -32,7 +32,7 @@ commands:
           command: |
             aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
             aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
-  install_awscli:
+  install_aws_cli:
     description: Install AWS CLI
     steps:
       - run:
@@ -177,10 +177,12 @@ jobs:
             --query 'Reservations[*].Instances[*].PublicIpAddress' \
             --filters "Name=tag-value,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
             --output text >> .circleci/ansible/inventory.txt
+      - run: exit 1
       - persist_to_workspace:
           root: .
           paths:
             - ./.circleci/ansible/inventory.txt
+      - install_aws_cli    
       - destroy-environment
 
 
@@ -207,7 +209,7 @@ jobs:
           command: |
             cd .circleci/ansible
             ansible-playbook -i inventory.txt configure-server.yml
-      - install_awscli
+      - install_aws_cli
       - destroy-environment   
 
 
@@ -253,16 +255,16 @@ jobs:
             echo "API_URL = ${API_URL}"
             echo API_URL="${API_URL}" >> frontend/.env
             cat frontend/.env
-      # - run:
-      #     name: Deploy frontend objects
-      #     command: |
-      #       cd frontend
-      #       npm install
-      #       npm run build
-      #       tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
-      #       aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+      - run:
+          name: Deploy frontend objects
+          command: |
+            cd frontend
+            npm install
+            npm run build
+            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
+            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
       # Here's where you will add some code to rollback on failure
-      - install_awscli
+      - install_aws_cli
       - empty-bucket
       - destroy-environment
 
