@@ -1,104 +1,18 @@
-
-
 ---
-- name: extract artifact
+- name: "copy artifacts to server"
   become: true
-  unarchive:
-    src: files/artifact.tar.gz
-    dest: .
+  copy:
+    src: ~/project/artifact.tar.gz
+    dest: ./artifact.tar.gz
 
-- name: load environment variables
-  become_method: sudo
-  become_user: root
+- name: "extract file"
   become: true
   shell: |
-    ls -al
-    echo "NODE_ENV=production" >> .env
-    echo "ENVIRONMENT=production" >> .env
-    echo "TYPEORM_CONNECTION={{ lookup('env', 'TYPEORM_CONNECTION')}}" >> .env
-    echo "TYPEORM_ENTITIES={{ lookup('env', 'TYPEORM_ENTITIES')}}" >> .env
-    echo "TYPEORM_HOST={{ lookup('env', 'TYPEORM_HOST')}}" >> .env
-    echo "TYPEORM_PORT={{ lookup('env', 'TYPEORM_PORT')}}" >> .env
-    echo "TYPEORM_USERNAME={{ lookup('env', 'TYPEORM_USERNAME')}}" >> .env
-    echo "TYPEORM_PASSWORD={{ lookup('env', 'TYPEORM_PASSWORD')}}" >> .env
-    echo "TYPEORM_DATABASE={{ lookup('env', 'TYPEORM_DATABASE')}}" >> .env
-    echo "TYPEORM_MIGRATIONS={{ lookup('env', 'TYPEORM_MIGRATIONS')}}" >> .env
-    echo "TYPEORM_MIGRATIONS_DIR={{ lookup('env', 'TYPEORM_MIGRATIONS_DIR')}}" >> .env
-    
-- name: start server
+    tar xzvf artifact.tar.gz
+
+- name: "Start node server"
   become: true
-  become_method: sudo
-  become_user: root 
   shell: |
     npm install
     pm2 stop default
     pm2 start npm -- start
-    pm2 start dist/main.js --name node-app
-
-
-# ---
-# # - name: extract artifact
-# #   become: true
-# #   unarchive:
-# #     src: files/artifact.tar.gz
-# #     dest: .
-# - name: "extract deploy and start backend" 
-#   become: true 
-#   shell: echo "extract"
-
-# - name: "copy over artifact"
-#   become: true 
-#   copy:
-#     src: ~/project/artifact.tar.gz
-#     dest: ./artifact.tar.gz
-
-# - name: "extract the zipped artifact"
-#   become: true  
-#   shell: | 
-#     tar xzvf artifact.tar.gz 
-
-# - name: load environment variables
-#   become_method: sudo
-#   become_user: root
-#   become: true
-#   shell: |
-#     ls -al
-#     echo "NODE_ENV=production" >> .env
-#     echo "ENVIRONMENT=production" >> .env
-#     echo "TYPEORM_CONNECTION={{ lookup('env', 'TYPEORM_CONNECTION')}}" >> .env
-#     echo "TYPEORM_ENTITIES={{ lookup('env', 'TYPEORM_ENTITIES')}}" >> .env
-#     echo "TYPEORM_HOST={{ lookup('env', 'TYPEORM_HOST')}}" >> .env
-#     echo "TYPEORM_PORT={{ lookup('env', 'TYPEORM_PORT')}}" >> .env
-#     echo "TYPEORM_USERNAME={{ lookup('env', 'TYPEORM_USERNAME')}}" >> .env
-#     echo "TYPEORM_PASSWORD={{ lookup('env', 'TYPEORM_PASSWORD')}}" >> .env
-#     echo "TYPEORM_DATABASE={{ lookup('env', 'TYPEORM_DATABASE')}}" >> .env
-#     echo "TYPEORM_MIGRATIONS={{ lookup('env', 'TYPEORM_MIGRATIONS')}}" >> .env
-#     echo "TYPEORM_MIGRATIONS_DIR={{ lookup('env', 'TYPEORM_MIGRATIONS_DIR')}}" >> .env
-
-
-
-
-# - name: start server
-#   become: true
-#   become_method: sudo
-#   become_user: root 
-#   shell: |
-#     npm install
-#     pm2 stop default
-#     pm2 start npm -- start
-#     pm2 start dist/main.js --name node-app
-# # - name : "start server"    
-# #   become: true
-# #   shell: |
-# #     npm install
-# #     pm2 stop default
-# #     pm2 start dist/main.js --name node-appx
-# # - name: start server
-#     # pm2 start npm -- start    
-# #   become: true
-# #   become_method: sudo
-# #   become_user: root 
-# #   shell: |
-# #     npm install
-# #     pm2 stop default
-# #     pm2 start npm -- start

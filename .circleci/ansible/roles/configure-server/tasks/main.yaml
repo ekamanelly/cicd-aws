@@ -1,6 +1,7 @@
 ---
-- name: "update apt packages."
+- name: "update app packages"
   become: true
+  become_method: sudo  
   apt:
     update_cache: yes
 
@@ -9,23 +10,11 @@
   apt:
     upgrade: yes
 
-- name: remove dependencies that are no longer required
-  become: true
-  apt:
-    autoremove: yes
-
-- name: "install python3."
-  become: true
-  apt:
-    name: ["python3"]
-    state: latest
-    update_cache: yes
-
-- name: "install nodejs and npm."
+- name: "install dependencies"
   become: true
   apt:
     name: ["nodejs", "npm"]
-    state: latest
+    state: present
     update_cache: yes
 
 - name: "install pm2"
@@ -35,3 +24,7 @@
     global: yes
     production: yes
     state: present
+
+- name: "sleep a bit"
+  become: true
+  shell: sleep 120    
