@@ -63,69 +63,90 @@ commands:
   #           fi
             
 jobs:
-  # build-frontend:
-  #   docker:
-  #     - image: circleci/node:13.8.0
-  #   steps:
-  #     - checkout
-  #     - restore_cache:
-  #         keys: [frontend-build]
-  #     - run:
-  #         name: Build front-end
-  #         command: |
-  #           # Your code here
-  #           exit 1
-  #     - save_cache:
-  #         paths: [frontend/node_modules]
-  #         key: frontend-build
-
-  # build-backend:
-  #   docker:
-  #     - image: circleci/node:13.8.0
-  #   steps:
-  #     - checkout
-  #     - restore_cache:
-  #         keys: [backend-build]
-  #     - run:
-  #         name: Back-end build
-  #         command: |
-  #            # Your code here
-  #            exit 1
-  #     - save_cache:
-  #         paths: [backend/node_modules]
-  #         key: backend-build
-
-  # test-frontend:
-  #   docker:
-  #     # Docker image here
-  #   steps:
-  #     # Checkout code from git
-  #     # Restore from cache
-  #     # Your job code here
-                
-  # test-backend:
-  #   docker:
-  #     # Docker image here
-  #   steps:
-  #     # Checkout code from git
-  #     # Restore from cache
-  #     # Your job code here
-            
-  # scan-frontend:
-  #   docker:
-  #     # Docker image here
-  #   steps:
-  #     # Checkout code from git
-  #     # Restore from cache
-  #     # Your job code here
-
-  # scan-backend:
-  #   docker:
-  #     # Docker image here
-  #   steps:
-  #     # Checkout code from git
-  #     # Restore from cache
-  #     # Your job code here
+  build-frontend:
+    executor: node-image
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [frontend-build]
+      - run:
+          name: Build front-end
+          command: |
+              cd frontend
+              npm install
+              npm run build
+      - save_cache:
+          paths: [frontend/node_modules]
+          key: frontend-build
+  build-backend:
+    executor: node-image
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [backend-build]
+      - run:
+          name: Build front-end
+          command: |
+              cd backend
+              npm install
+              npm run build
+      - save_cache:
+          paths: [backend/node_modules]
+          key: frontend-build    
+  test-frontend:
+    executor: node-image
+    steps:
+      -  checkout
+      - restore_cache:
+          keys: [frontend-build]
+      - run: 
+          name: test frontend
+          command: |
+            cd frontend
+            npm install
+            npm run test
+      - save_cache:
+          paths: [frontend/node_modules]
+          key: frontend-build     
+  test-backend:
+    executor: node-image
+    steps:
+      -  checkout
+      - restore_cache:
+          keys: [backend-build]
+      - run: 
+          name: test backend
+          command: |
+            cd backend
+            npm install
+            npm run test
+      - save_cache:
+          paths: [backend/node_modules]
+          key: backend-build                
+  scan-frontend:
+    executor: node-image
+    steps:
+      - checkout
+      - run: 
+          name: scan frontend
+          command: |
+            cd frontend
+            npm install 
+            npm audit fix          
+            npm audit fix --audit-level=critical --force
+            npm audit --audit-level=critical
+  scan-backend:
+    executor: node-image
+    steps:
+      - checkout
+      - run: 
+          name: scan backend
+          command: |
+            cd backend
+            npm install
+            npm audit fix           
+            npm audit fix --audit-level=critical --force
+            npm audit --audit-level=critical   
 
   
   deploy-infrastructure:
@@ -141,14 +162,14 @@ jobs:
             --tags project=udapeople \
             --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
             --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
-      # - run:
-      #     name: Ensure front-end infrastructure exist
-      #     command: |
-      #       aws cloudformation deploy \
-      #       --template-file .circleci/files/frontend.yml \
-      #       --tags project=udapeople \
-      #       --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
-      #       --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
+      - run:
+          name: Ensure front-end infrastructure exist
+          command: |
+            aws cloudformation deploy \
+            --template-file .circleci/files/frontend.yml \
+            --tags project=udapeople \
+            --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
+            --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
       - run:
           name: Add back-end ip to ansible inventory
           command: |
@@ -211,41 +232,40 @@ jobs:
 
       - destroy-environment
       
-  # deploy-frontend:
-  #   executor: ansible-image
-  #   steps:
-  #     - checkout
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           apk add --update nodejs npm tar gzip jq curl
-  #           pip3 install awscli
-  #     - run:
-  #         name: Get backend url
-  #         command: |
-  #           export BACKEND_IP=$(aws ec2 describe-instances \
-  #             --filters "Name=tag:Name,Values=UdaPeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-  #               'Name=instance-state-name,Values=running' \
-  #             --query 'Reservations[*].Instances[*].PublicIpAddress' \
-  #             --output text)
+  deploy-frontend:
+    executor: ansible-image
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update nodejs npm tar gzip jq curl
+            pip3 install awscli
+      - run:
+          name: Get backend url
+          command: |
+            export BACKEND_IP=$(aws ec2 describe-instances \
+              --filters "Name=tag-value,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --output text)
 
-  #           export API_URL="http://${BACKEND_IP}:3030"
+            export API_URL="http://${BACKEND_IP}:3030"
 
-  #           echo "API_URL = ${API_URL}"
-  #           echo API_URL="${API_URL}" >> frontend/.env
-  #           cat frontend/.env
-  #     - run:
-  #         name: Deploy frontend objects
-  #         command: |
-  #           cd frontend
-  #           npm install
-  #           npm run build
-  #           tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
-  #           aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-  #     # Here's where you will add some code to rollback on failure
-  #     - install_awscli
-  #     - empty-bucket
-  #     - destroy-environment
+            echo "API_URL = ${API_URL}"
+            echo API_URL="${API_URL}" >> frontend/.env
+            cat frontend/.env
+      # - run:
+      #     name: Deploy frontend objects
+      #     command: |
+      #       cd frontend
+      #       npm install
+      #       npm run build
+      #       tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
+      #       aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+      # Here's where you will add some code to rollback on failure
+      - install_awscli
+      - empty-bucket
+      - destroy-environment
   deploy-backend:
     executor: ansible-image
     steps:
@@ -273,6 +293,9 @@ jobs:
             echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml -vvv
+      - empty-bucket
+      - destroy-environment
+
 
  
 
@@ -338,27 +361,27 @@ jobs:
 workflows:
   default:
     jobs:
-      # - build-frontend
-      # - build-backend
-      # - test-frontend:
-      #     requires: [build-frontend]
-      # - test-backend:
-      #     requires: [build-backend]
-      # - scan-backend:
-      #     requires: [build-backend]
-      # - scan-frontend:
-      #     requires: [build-frontend]
-      - deploy-infrastructure
-          # requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-          # filters:
-          #   branches:
-          #     only: [test-feature-branch]
+      - build-frontend
+      - build-backend
+      - test-frontend:
+          requires: [build-frontend]
+      - test-backend:
+          requires: [build-backend]
+      - scan-backend:
+          requires: [build-backend]
+      - scan-frontend:
+          requires: [build-frontend]
+      - deploy-infrastructure:
+          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+          filters:
+            branches:
+              only: [test-feature-branch]
       - configure-infrastructure:
           requires: [deploy-infrastructure]
       - run-migrations:
           requires: [configure-infrastructure]
-      # - deploy-frontend:
-      #     requires: [run-migrations]
+      - deploy-frontend:
+          requires: [run-migrations]
       - deploy-backend:
           requires: [run-migrations]
       # - smoke-test:
