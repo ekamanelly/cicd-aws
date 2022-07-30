@@ -2,7 +2,7 @@
 - name: "copy artifacts to server"
   become: true
   copy:
-    src: ~/project/artifact.tar.gz
+    src: ~/project/backend/artifact.tar.gz
     dest: ./artifact.tar.gz
 
 - name: "extract file"
