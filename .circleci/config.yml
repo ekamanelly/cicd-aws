@@ -202,15 +202,15 @@ jobs:
             cat .circleci/ansible/inventory.txt
             apk add --update ansible
             apk add openssh
-            apk add curl 
-            apk add unzip
+            apk tar
+            apk gzip
+            apk  aws-cli
       - run: exit 1      
       - run:
           name: Configure server
           command: |
             cd .circleci/ansible
             ansible-playbook -i inventory.txt configure-server.yml
-      - install_aws_cli
       - destroy-environment   
 
 
