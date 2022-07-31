@@ -202,7 +202,6 @@ jobs:
             apk add python 
             apk add curl
             apk add unzip
-      - run: exit 1
       - run:
           name: Configure server
           command: |
