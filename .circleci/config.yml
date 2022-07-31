@@ -297,21 +297,24 @@ jobs:
       - destroy-environment
 
   smoke-test:
-    docker:
-      # Docker image here that supports AWS CLI
-      - image: circleci/node:13.8.0
+    executor: node-image
     steps:
       # Checkout code from git
       - checkout
-      - attach_workspace:
-          at: ~/
+      - run:
+          command: sudo apt install -y curl unzip python3
+      - install_aws_cli        
+          # when: on_fail
+      # - attach_workspace:
+      #     at: ~/
       - run:
           name:
             Backend smoke test.
             # Fetch and prepare the BACKEND_IP env var
           command: |
-            cat .circleci/ansible/inventory.txt
-            export backend_ip=$(cat .circleci/ansible/inventory.txt| head -2 | tail -1)
+            export backend_ip=$(aws ec2 describe-instances \
+            --query 'Reservations[*].Instances[*].PublicIpAddress' \
+            --filters "Name=tag-value,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}")
             export API_URL="http://${backend_ip}:3030"
             echo "${API_URL}"
             if curl "${API_URL}/api/status" | grep "ok"
@@ -333,10 +336,6 @@ jobs:
               else
                 exit 1
               fi
-      - run:
-          command: sudo apt install -y curl unzip python
-          when: on_fail
-      - install_aws_cli        
       - destroy-environment
       - revert-migrations:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
