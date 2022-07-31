@@ -293,7 +293,7 @@ jobs:
       - empty-bucket
       - destroy-environment
 
-  smoke_test:
+  smoke-test:
     docker:
       # Docker image here that supports AWS CLI
       - image: circleci/node:13.8.0
