@@ -176,6 +176,10 @@ jobs:
             --query 'Reservations[*].Instances[*].PublicIpAddress' \
             --filters "Name=tag-value,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
             --output text >> .circleci/ansible/inventory.txt
+      - run: 
+          name: display ip
+          command: | 
+              cat .circleci/ansible/inventory.txt 
       - persist_to_workspace:
           root: .
           paths:
@@ -302,13 +306,11 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
-          name: chill a bit
-          command: sleep 30
-      - run:
           name:
             Backend smoke test.
             # Fetch and prepare the BACKEND_IP env var
           command: |
+            cat .circleci/ansible/inventory.txt
             export backend_ip=$(cat .circleci/ansible/inventory.txt| head -2 | tail -1)
             export API_URL="http://${backend_ip}:3030"
             echo "${API_URL}"
@@ -332,7 +334,7 @@ jobs:
                 exit 1
               fi
       - run:
-          command: sudo apt install -y curl unzip
+          command: sudo apt install -y curl unzip python
           when: on_fail
       - install_aws_cli        
       - destroy-environment
