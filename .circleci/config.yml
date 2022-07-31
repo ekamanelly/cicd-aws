@@ -38,9 +38,9 @@ commands:
       - run:
           name: Install AWS CLI v2
           command: |
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            ./aws/install
+            curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+            unzip awscli-bundle.zip
+            ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
           when: on_fail
 
   # revert-migrations:
@@ -202,9 +202,9 @@ jobs:
             cat .circleci/ansible/inventory.txt
             apk add --update ansible
             apk add openssh
-            apk add tar
-            apk add gzip
-            apk add aws-cli
+            apk add python 
+            apk add curl
+            apk add unzip
       - run: exit 1      
       - run:
           name: Configure server
