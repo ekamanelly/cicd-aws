@@ -300,7 +300,6 @@ jobs:
     steps:
       # Checkout code from git
       - checkout
-      - prepare_aws_env
       - attach_workspace:
           at: ~/
       - run:
