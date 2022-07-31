@@ -297,13 +297,12 @@ jobs:
       - destroy-environment
 
   smoke-test:
-    executor: node-image
+    executor: aws-cli-image
     steps:
       # Checkout code from git
       - checkout
       - run:
-          command: sudo apt install -y curl unzip python3
-      - install_aws_cli        
+          command: yum install -y curl      
           # when: on_fail
       # - attach_workspace:
       #     at: ~/
