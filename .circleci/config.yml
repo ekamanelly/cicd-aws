@@ -333,6 +333,10 @@ jobs:
               else
                 exit 1
               fi
+      - run:
+          command: sudo apt install -y curl unzip
+          when: on_fail
+      - install_aws_cli        
       - destroy-environment
       - revert-migrations:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
