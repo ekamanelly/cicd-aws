@@ -367,13 +367,12 @@ jobs:
             --tags project=udapeople 
 
   cleanup:
-    executor: aws-cli
+    executor: aws-cli-image
     steps:
       - checkout # Checkout code from git
       - run:
           name: Install dependencies
-          command: |
-            yum install -y tar gzip
+          command: yum install -y tar gzip
       - attach_workspace:
           at: ~/
       - run:
