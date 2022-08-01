@@ -385,6 +385,13 @@ jobs:
       - run:
           name: Get old stack workflow id
           command: |
+            export STACKS=($(aws cloudformation list-stacks \
+                --query "StackSummaries[*].StackName" \
+                --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
+            echo Stack names: "${STACKS[@]}"          
+      - run:
+          name: Get old stack workflow id
+          command: |
             export OldWorkflowID=$(cat .circleci/prvJob.txt)
             echo OldWorkflowID: "${OldWorkflowID}"
       - run:
@@ -395,10 +402,10 @@ jobs:
             aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
             aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
             aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}" 
-      # - empty-bucket
-      # - destroy-environment
-      # - revert-migrations:
-      #     workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}        
+      - empty-bucket
+      - destroy-environment
+      - revert-migrations:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}        
 
 workflows:
   default:
