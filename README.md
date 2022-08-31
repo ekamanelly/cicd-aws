@@ -51,13 +51,13 @@
   - [s3 bucket](.circleci/files/frontend.yml)
 
 #### Configure-infrastructure
-  We did some configuration in our newly created instance with Ansible. The environment variables like Postgres hostName and password was secretly move form circleCi over to EC2 with ansible `environment:` step
+  We did some configuration in our newly created instance with Ansible. The environment variables like Postgres hostName and password was securely moved from circleCi over to EC2 with ansible `environment:` step
 
 #### run-migrations
   we used a node supported image to run our application migration script and stored the outcome on  kvdb.io
   
 #### deploy-backend
-  we install Prometheous Exporter for monitoring, copied over the artifact to our instance, and started the app with Pm2 
+  we install Prometheous node Exporter for monitoring, copied over the artifact to our instance, and started the app with pm2 and npm
 
 #### deploy-frontend
    We append the Ip address onto `env.`, build it again and copy over the artifact to S3 with Ansible
@@ -66,10 +66,10 @@
   Did a smoke test on "status ok"  endpoint of the server to make sure the server is up and responding to request
 
 #### cloudfront-update
-  If smoke test comes with a green status, we switch our cloudfront to point to the new S3 bucket 
+  If smoke test comes with a green/positive status, we switch our cloudfront to point to the new S3 bucket 
   
 #### - cleanup
-  finally we keep the house clean by removing the previous bucket or Ec2 that failed smoke test
+  finally we keep the house clean by removing the previous S3 bucket or Ec2 that failed smoke test
 
 ##  Thees are some screenshot from slack notification and prometheus
 #### notiifcation when server in down `up==0
