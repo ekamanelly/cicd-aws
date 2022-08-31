@@ -6,7 +6,15 @@
   - it is Nest.js backend and React.js frontend 
   - the React app is delivered via cloudfront with s3 bucket 
   - the Nest app is on t3.maicro
-
+  
+## Built with 
+  - Circle CI - Cloud-based CI/CD service
+  - Amazon AWS - Cloud services
+  - AWS CLI - Command-line tool for AWS
+  - CloudFormation - Infrastrcuture as code
+  - Ansible - Configuration management tool
+  - Prometheus - Monitoring tool
+  - slack
 
 #### workflow and jobs for build and test
 
