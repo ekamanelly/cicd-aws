@@ -1,64 +1,72 @@
-We are archiving this repository because we do not want learners to push personal development to the current repository. If you have any issues or suggestions to make, feel free to:
-- Utilize the https://knowledge.udacity.com/ forum to seek help on content-specific issues.
-- [Submit a support ticket](https://udacity.zendesk.com/hc/en-us/requests/new) along with the link to your forked repository. 
-- If you are an enterprise learner, please [Submit a support ticket here](https://udacityenterprise.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000279131)
 
-## Give your Application Auto-Deploy Superpowers
 
-In this project, you will prove your mastery of the following learning objectives:
 
-- Explain the fundamentals and benefits of CI/CD to achieve, build, and deploy automation for cloud-based software products.
-- Utilize Deployment Strategies to design and build CI/CD pipelines that support Continuous Delivery processes.
-- Utilize a configuration management tool to accomplish deployment to cloud-based servers.
-- Surface critical server errors for diagnosis using centralized structured logging.
+# Overview
+  - this Pipeline deploys tested code on the master to AWS with a green blue strategy
+  - it is Nest.js backend and React.js frontend 
+  - the React app is delivered via cloudfront with s3 bucket 
+  - the Nest app is on t3.maicro
 
-![Diagram of CI/CD Pipeline we will be building.](udapeople.png)
 
-### Instructions
+#### workflow and jobs for build and test
 
-* [Selling CI/CD](instructions/0-selling-cicd.md)
-* [Getting Started](instructions/1-getting-started.md)
-* [Deploying Working, Trustworthy Software](instructions/2-deploying-trustworthy-code.md)
-* [Configuration Management](instructions/3-configuration-management.md)
-* [Turn Errors into Sirens](instructions/4-turn-errors-into-sirens.md)
+  There are 6 jobs that runs on any other branch except master. 
 
-### Project Submission
+  ![build and test](/images/SCREENSHOT10.png)
 
-For your submission, please submit the following:
+  They are 
 
-- A text file named `urls.txt` including:
-  1. Public Url to GitHub repository (not private) [URL01]
-  1. Public URL for your S3 Bucket (aka, your green candidate front-end) [URL02]
-  1. Public URL for your CloudFront distribution (aka, your blue production front-end) [URL03]
-  1. Public URLs to deployed application back-end in EC2 [URL04]
-  1. Public URL to your Prometheus Server [URL05]
-- Your screenshots in JPG or PNG format, named using the screenshot number listed in the instructions. These screenshots should be included in your code repository in the root folder.
-  1. Job failed because of compile errors. [SCREENSHOT01]
-  1. Job failed because of unit tests. [SCREENSHOT02]
-  1. Job that failed because of vulnerable packages. [SCREENSHOT03]
-  1. An alert from one of your failed builds. [SCREENSHOT04]
-  1. Appropriate job failure for infrastructure creation. [SCREENSHOT05]
-  1. Appropriate job failure for the smoke test job. [SCREENSHOT06]
-  1. Successful rollback after a failed smoke test. [SCREENSHOT07]  
-  1. Successful promotion job. [SCREENSHOT08]
-  1. Successful cleanup job. [SCREENSHOT09]
-  1. Only deploy on pushed to `master` branch. [SCREENSHOT10]
-  1. Provide a screenshot of a graph of your EC2 instance including available memory, available disk space, and CPU usage. [SCREENSHOT11]
-  1. Provide a screenshot of an alert that was sent by Prometheus. [SCREENSHOT12]
+  - Build frontend
+  - Scan frontend 
+  - Test frontend
+  - Build backend
+  - Scan backend 
+  - Test backend 
 
-- Your presentation should be in PDF format named "presentation.pdf" and should be included in your code repository root folder. 
+#### workflow and jobs to provision infrastructure and deploy artifacts 
+  there are 8 jobs that works in series to deploy artifact and we highlight some of their tests 
 
-Before you submit your project, please check your work against the project rubric. If you haven’t satisfied each criterion in the rubric, then revise your work so that you have met all the requirements. 
 
-### Built With
+  - deploy-infrastructure
+  - configure-infrastructure
+  - run-migrations
+  - deploy-backend
+  - deploy-frontend
+  - smoke-test
+  - cloudfront-update
+  - cleanup
 
-- [Circle CI](www.circleci.com) - Cloud-based CI/CD service
-- [Amazon AWS](https://aws.amazon.com/) - Cloud services
-- [AWS CLI](https://aws.amazon.com/cli/) - Command-line tool for AWS
-- [CloudFormation](https://aws.amazon.com/cloudformation/) - Infrastrcuture as code
-- [Ansible](https://www.ansible.com/) - Configuration management tool
-- [Prometheus](https://prometheus.io/) - Monitoring tool
 
-### License
+#### deploy-infrastructure 
+  This job used cloud formation to create stacks on AWS. it used an image that supports aws-cli `amazon/aws-cli`, then appended Ip address to Ansible inventory file. you can see the yml files. 
+  - [ec2 and security group](.circleci/files/backend.yml) 
+  - [s3 bucket](.circleci/files/frontend.yml)
 
-[License](LICENSE.md)
+#### Configure-infrastructure
+  We did some configuration in our newly created instance with Ansible. The environment variables like Postgres hostName and password was secretly move form circleCi over to EC2 with ansible `environment:` step
+
+#### run-migrations
+  we used a node supported image to run our application migration script and stored the outcome on  kvdb.io
+  
+#### deploy-backend
+  we install Prometheous Exporter for monitoring, copied over the artifact to our instance, and started the app with Pm2 
+
+#### deploy-frontend
+   We append the Ip address onto `env.`, build it again and copy over the artifact to S3 with Ansible
+
+#### smoke-test  
+  Did a smoke test a status endpoint of the server and the
+
+#### cloudfront-update
+  If smoke test comes with a green status, we switch our cloudfront to point to the new S3 bucket 
+  
+#### - cleanup
+  finally we keep the house clean by removing the previous bucket or Ec2 that failed smoke test
+
+  thees are some screenshot from slack notification and prometheus
+#### notiifcation when server in down `up==0
+  ![slack ](/images/SCREENSHOT12.png)
+#### free space  
+  ![ ](/images/SCREENSHOT11.png)
+#### cpu usage   
+  ![slack ](/images/SCREENSHOT14.png)

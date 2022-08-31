@@ -1,0 +1,7 @@
+PROMETHEUS => http://ec2-23-22-230-216.compute-1.amazonaws.com:9090/targets
+
+GITHUB =>   https://github.com/ekamanelly/cicd-aws
+
+CLOUDFRONT => https://d3f9x5ku89rftv.cloudfront.net
+
+BACK END =>  http://ec2-54-237-241-246.compute-1.amazonaws.com:3030/api/status
