@@ -8,7 +8,7 @@
   - the Nest app is on t3.maicro
   
 ## Built with 
-  - Circle CI - Cloud-based CI/CD service
+  - Circle CI -  see the [config.yml](.circleci/config.yml) file
   - Amazon AWS - Cloud services
   - AWS CLI - Command-line tool for AWS
   - CloudFormation - Infrastrcuture as code
