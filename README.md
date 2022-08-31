@@ -63,7 +63,7 @@
    We append the Ip address onto `env.`, build it again and copy over the artifact to S3 with Ansible
 
 #### smoke-test  
-  Did a smoke test a status endpoint of the server and the
+  Did a smoke test on "status ok"  endpoint of the server to make sure the server is up and responding to request
 
 #### cloudfront-update
   If smoke test comes with a green status, we switch our cloudfront to point to the new S3 bucket 
@@ -71,7 +71,7 @@
 #### - cleanup
   finally we keep the house clean by removing the previous bucket or Ec2 that failed smoke test
 
-  thees are some screenshot from slack notification and prometheus
+##  Thees are some screenshot from slack notification and prometheus
 #### notiifcation when server in down `up==0
   ![slack ](/images/SCREENSHOT12.png)
 #### free space  
