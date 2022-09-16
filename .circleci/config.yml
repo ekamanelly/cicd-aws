@@ -191,7 +191,7 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys:
-          fingerprints: ["51:71:8b:a0:32:d4:5e:7b:3b:f7:80:45:e0:70:13:e1"]
+          fingerprints: ["1f:df:54:12:ab:ac:53:df:30:a5:d9:4c:07:9b:e2:ba"]
       - attach_workspace:
           at: ./
       - run:
@@ -274,7 +274,7 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys:
-          fingerprints: ["51:71:8b:a0:32:d4:5e:7b:3b:f7:80:45:e0:70:13:e1"]
+          fingerprints: ["1f:df:54:12:ab:ac:53:df:30:a5:d9:4c:07:9b:e2:ba"]
       - attach_workspace:
           at: ./
       - run:
@@ -439,3 +439,5 @@ workflows:
           requires: [smoke-test]
       - cleanup:
           requires: [cloudfront-update]
+
+
