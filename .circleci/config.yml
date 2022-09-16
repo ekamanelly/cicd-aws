@@ -134,6 +134,7 @@ jobs:
             npm install 
             npm audit fix          
             npm audit fix --audit-level=critical --force
+            npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
   scan-backend:
     executor: node-image
@@ -145,6 +146,7 @@ jobs:
             cd backend
             npm install
             npm audit fix           
+            npm audit fix --audit-level=critical --force
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
 
